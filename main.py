@@ -12,22 +12,23 @@ def load_key():
     file.close()
     return key
 
-key = load_key()
 master_pwd = input("Please enter the master password: ")
+key = load_key() + master_pwd.encode()
+fer = Fernet(key)
 
 def view():
     with open('passwords.txt', 'r') as f:
         for line in f.readlines():
             data = line.rstrip()
             username, passw = data.split('|')
-            print("Username: ", username, "| Password: ", passw)
+            print("Username: ", username, "| Password: ", fer.decrypt(passw.encode()).decode())
 
 def add():
     acc_name = input("Account name: ")
     pwd = input("Password: ")
 
     with open('passwords.txt', 'a') as f:
-        f.write(acc_name + '|' + pwd + '\n')
+        f.write(acc_name + '|' + fer.encrypt(pwd.encode()).decode() + '\n')
 
 while True:
     mode = input("Would you like to add new password or view your passwords?(type view, add or q to quit): ").lower()
